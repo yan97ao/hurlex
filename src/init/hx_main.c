@@ -29,14 +29,25 @@
 #include "thread.h"
 #include "scheduler.h"
 #include "keyboard.h"
+#include "spinlock.h"
 
 // 定义 elf 相关信息数据
 elf_t kernel_elf;
 
+// 内核自旋锁
+spinlock_t lock;
+
+// 测试变量
+int index = 0;
+
 // 内核线程函数
 int thread_func(void *arg)
 {
-	printk("New Thread is Running!\n");
+	while (1) {
+		spinlock_lock(&lock);
+		printk("%d\n", ++index);
+		spinlock_unlock(&lock);
+	}
 
 	return (int)arg;
 }
@@ -74,6 +85,7 @@ int hx_main(multiboot_t *mboot_ptr)
 	printk_color(rc_black, rc_cyan, "Start Paging Mode ...\n\n");
 	
 	printk_color(rc_black, rc_magenta, "Kernel heap created ...\n\n");
+
 /*	printk_color(rc_black, rc_magenta, "Test kmalloc() && kfree() now ...\n\n");
 
 	void *addr1 = kmalloc(50);
@@ -95,19 +107,19 @@ int hx_main(multiboot_t *mboot_ptr)
 	kfree(addr4);
 */
 
+	spin_lock_init(&lock);
+
 	// 初始化内核线程调度
-	//init_scheduler(init_threading());
+	init_scheduler(init_threading());
 	
 	// 申请 1 KB 内存作为内核线程的栈
-	//void *thread_stack = kmalloc(0x400);
+	void *thread_stack = kmalloc(0x400);
 
 	// 创建内核线程，注意栈地址从高往低增长
-	//kernel_thread(thread_func, 0, thread_stack + 0x400);
+	kernel_thread(thread_func, 0, thread_stack + 0x400);
 
 	// 初始化时钟中断
-	//init_timer(20);
-
-	//printk("Old Thread is it!\n");
+	init_timer(20);
 
 	// 初始化键盘驱动
 	init_keyboard_driver();
@@ -115,22 +127,28 @@ int hx_main(multiboot_t *mboot_ptr)
 	// 解除对 INTR 中断的屏蔽
 	asm volatile("sti");
 
-	char ch;
-	int color = rc_black;
 	while (1) {
-		ch = keyboard_getchar();
-		if (ch) {
-			if (++color == rc_white + 1) {
-				color = rc_black + 1;
-			}
-			if (ch == '\b') {
-				monitor_putc_color(ch, rc_black, color);
-				monitor_putc_color(' ', rc_black, rc_black);
-			}
-			monitor_putc_color(ch, rc_black, color);
-		}
+		spinlock_lock(&lock);
+		printk("%d\n", ++index);
+		spinlock_unlock(&lock);
 	}
 
+//	char ch;
+//	int color = rc_black;
+//	while (1) {
+//		ch = keyboard_getchar();
+//		if (ch) {
+//			if (++color == rc_white + 1) {
+//				color = rc_black + 1;
+//			}
+//			if (ch == '\b') {
+//				monitor_putc_color(ch, rc_black, color);
+//				monitor_putc_color(' ', rc_black, rc_black);
+//			}
+//			monitor_putc_color(ch, rc_black, color);
+//		}
+//	}
+//
 	return 0;
 }
 
