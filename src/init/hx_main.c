@@ -116,7 +116,7 @@ int hx_main(multiboot_t *mboot_ptr)
 	void *thread_stack = kmalloc(0x400);
 
 	// 创建内核线程，注意栈地址从高往低增长
-	kernel_thread(thread_func, 0, thread_stack + 0x400);
+	//kernel_thread(thread_func, 0, thread_stack + 0x400);
 
 	// 初始化时钟中断
 	init_timer(20);
@@ -127,28 +127,28 @@ int hx_main(multiboot_t *mboot_ptr)
 	// 解除对 INTR 中断的屏蔽
 	asm volatile("sti");
 
+//	while (1) {
+//		spinlock_lock(&lock);
+//		printk("%d\n", ++index);
+//		spinlock_unlock(&lock);
+//	}
+
+	char ch;
+	int color = rc_black;
 	while (1) {
-		spinlock_lock(&lock);
-		printk("%d\n", ++index);
-		spinlock_unlock(&lock);
+		ch = keyboard_getchar();
+		if (ch) {
+			if (++color == rc_white + 1) {
+				color = rc_black + 1;
+			}
+			if (ch == '\b') {
+				monitor_putc_color(ch, rc_black, color);
+				monitor_putc_color(' ', rc_black, rc_black);
+			}
+			monitor_putc_color(ch, rc_black, color);
+		}
 	}
 
-//	char ch;
-//	int color = rc_black;
-//	while (1) {
-//		ch = keyboard_getchar();
-//		if (ch) {
-//			if (++color == rc_white + 1) {
-//				color = rc_black + 1;
-//			}
-//			if (ch == '\b') {
-//				monitor_putc_color(ch, rc_black, color);
-//				monitor_putc_color(' ', rc_black, rc_black);
-//			}
-//			monitor_putc_color(ch, rc_black, color);
-//		}
-//	}
-//
 	return 0;
 }
 

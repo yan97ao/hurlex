@@ -86,7 +86,7 @@ inline int strlen(const char *src)
 {
 	const char *eos = src;
 
-        while(*eos++)
+        while (*eos++)
 	      ;
 	        
 	return (eos - src - 1);
