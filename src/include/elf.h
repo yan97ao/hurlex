@@ -19,7 +19,7 @@
 #ifndef INCLUDE_ELF_H_
 #define INCLUDE_ELF_H_
 
-#include "common.h"
+#include "types.h"
 #include "multiboot.h"
 
 #define ELF32_ST_TYPE(i) ((i)&0xf)

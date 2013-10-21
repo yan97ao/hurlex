@@ -19,7 +19,7 @@
 #ifndef INCLUDE_VMM_H
 #define INCLUDE_VMM_H
 
-#include "common.h"
+#include "types.h"
 #include "idt.h"
 
 // 页目录虚拟地址

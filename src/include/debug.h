@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  timer.h
+ *       Filename:  debug.h
  *
- *    Description:  定义 PIT(周期中断定时器) 相关函数
+ *    Description:  调试相关的函数
  *
  *        Version:  1.0
- *        Created:  2013年07月27日 09时25分04秒
+ *        Created:  2013年10月21日 15时12分48秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -16,11 +16,10 @@
  * =====================================================================================
  */
 
-#ifndef INCLUDE_TIMER_H_
-#define INCLUDE_TIMER_H_
+#ifndef INCLUDE_DEBUG_H_
+#define INCLUDE_DEBUG_H_
 
-#include "types.h"
+// 打印当前的段存器值
+void print_cur_status();
 
-void init_timer(uint32_t frequency);
-
-#endif 	// INCLUDE_TIMER_H_
+#endif 	// INCLUDE_DEBUG_H_

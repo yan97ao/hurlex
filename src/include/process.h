@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  timer.h
+ *       Filename:  process.h
  *
- *    Description:  定义 PIT(周期中断定时器) 相关函数
+ *    Description:  进程管理相关的定义
  *
  *        Version:  1.0
- *        Created:  2013年07月27日 09时25分04秒
+ *        Created:  2013年10月21日 16时18分41秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -16,11 +16,23 @@
  * =====================================================================================
  */
 
-#ifndef INCLUDE_TIMER_H_
-#define INCLUDE_TIMER_H_
+#ifndef INCLUDE_PROCESS_H_
+#define INCLUDE_PROCESS_H_
 
 #include "types.h"
 
-void init_timer(uint32_t frequency);
+// 进程状态描述
+typedef
+enum task_state {
 
-#endif 	// INCLUDE_TIMER_H_
+};
+
+// 进程控制块 PCB 
+typedef
+struct task_struct {
+	task_state state; 	// 进程当前状态
+	
+} task_struct;
+
+#endif 	// INCLUDE_PROCESS_H_
+

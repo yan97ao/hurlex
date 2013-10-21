@@ -1,7 +1,7 @@
 /*
  * =====================================================================================
  *
- *       Filename:  thread.h
+ *       Filename:  kthread.h
  *
  *    Description:  内核线程的定义
  *
@@ -19,7 +19,7 @@
 #ifndef INCLUDE_THREAD_H_
 #define INCLUDE_THREAD_H_
 
-#include "common.h"
+#include "types.h"
 
 typedef
 struct thread_t {

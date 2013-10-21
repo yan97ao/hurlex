@@ -19,6 +19,7 @@
 #include "idt.h"
 #include "printk.h"
 #include "string.h"
+#include "common.h"
 
 // 中断描述符表
 idt_entry_t idt_entries[256];

@@ -19,7 +19,7 @@
 #ifndef INCLUDE_HEAP_H_
 #define INCLUDE_HEAP_H_
 
-#include "common.h"
+#include "types.h"
 
 // 堆开始地址
 #define HEAP_START 0xD0000000

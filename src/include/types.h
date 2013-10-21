@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  common.h
+ *       Filename:  types.h
  *
  *    Description:  一些类型的定义
  *
  *        Version:  1.0
- *        Created:  2013年07月24日 20时07分26秒
+ *        Created:  2013年10月21日 16时28分07秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -16,18 +16,19 @@
  * =====================================================================================
  */
 
-#ifndef INCLUDE_COMMON_H_
-#define INCLUDE_COMMON_H_
+#ifndef INCLUDE_TYPES_H_
+#define INCLUDE_TYPES_H_
 
-#include "types.h"
+#ifndef NULL
+#define NULL 0
+#endif
 
-// 端口写一个字节
-void outb(uint16_t port, uint8_t value);
+typedef unsigned int   uint32_t;
+typedef          int   int32_t;
+typedef unsigned short uint16_t;
+typedef          short int16_t;
+typedef unsigned char  uint8_t;
+typedef          char  int8_t;
 
-// 端口读一个字节
-uint8_t inb(uint16_t port);
 
-// 端口读一个字
-uint16_t inw(uint16_t port);
-
-#endif // INCLUDE_COMMON_H_
+#endif 	// INCLUDE_TYPES_H_

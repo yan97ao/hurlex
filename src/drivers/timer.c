@@ -18,8 +18,9 @@
 
 #include "timer.h"
 #include "printk.h"
-#include "idt.h"
+#include "common.h"
 #include "scheduler.h"
+#include "idt.h"
 
 void timer_callback(pt_regs *regs)
 {

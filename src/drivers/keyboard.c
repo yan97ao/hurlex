@@ -16,6 +16,7 @@
  * =====================================================================================
  */
 
+#include "common.h"
 #include "keyboard.h"
 
 //Define your keyboard layouts here:

@@ -1,7 +1,7 @@
 /*
  * =====================================================================================
  *
- *       Filename:  thread.c
+ *       Filename:  kthread.c
  *
  *    Description:  内核线程的实现
  *
@@ -16,7 +16,7 @@
  * =====================================================================================
  */
 
-#include "thread.h"
+#include "kthread.h"
 #include "string.h"
 #include "heap.h"
 #include "printk.h"

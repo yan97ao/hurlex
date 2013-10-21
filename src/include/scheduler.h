@@ -19,8 +19,8 @@
 #ifndef INCLUDE_SCHEDULER_H_
 #define INCLUDE_SCHEDULER_H_
 
-#include "common.h"
-#include "thread.h"
+#include "types.h"
+#include "kthread.h"
 
 typedef
 struct thread_list {

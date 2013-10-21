@@ -18,7 +18,7 @@
 #ifndef INCLUDE_MULTIBOOT_H_
 #define INCLUDE_MULTIBOOT_H_
 
-#include "common.h"
+#include "types.h"
 
 #define MULTIBOOT_FLAG_MEM     0x001
 #define MULTIBOOT_FLAG_DEVICE  0x002
