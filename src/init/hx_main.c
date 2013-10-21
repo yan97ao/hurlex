@@ -104,17 +104,17 @@ int hx_main(multiboot_t *mboot_ptr)
 	printk("free mem in 0x%X\n\n", addr4);
 	kfree(addr4);
 */
-
-//	spin_lock_init(&lock);
+	// 初始化自旋锁
+	spin_lock_init(&lock);
 
 	// 初始化内核线程调度
-	init_scheduler(init_threading());
+//	init_scheduler(init_threading());
 	
 	// 申请 1 KB 内存作为内核线程的栈
 //	void *thread_stack = kmalloc(0x400);
 
 	// 创建内核线程，注意栈地址从高往低增长
-	//kernel_thread(thread_func, 0, thread_stack + 0x400);
+//	kernel_thread(thread_func, 0, thread_stack + 0x400);
 
 	// 初始化时钟中断
 	init_timer(20);
@@ -122,17 +122,18 @@ int hx_main(multiboot_t *mboot_ptr)
 	// 初始化键盘驱动
 	init_keyboard_driver();
 
+	// 打印当前 CPU 状态
 	print_cur_status();
 	
 	// 解除对 INTR 中断的屏蔽
-//	asm volatile("sti");
+	asm volatile("sti");
 
 //	while (1) {
 //		spinlock_lock(&lock);
 //		// TODO
 //		spinlock_unlock(&lock);
 //	}
-
+//
 //	char ch;
 //	int color = rc_black;
 //	while (1) {
