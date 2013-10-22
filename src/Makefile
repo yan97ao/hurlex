@@ -59,3 +59,12 @@ umount_image:
 .PHONY:run
 run:
 	bochs -f bochsrc.txt
+
+.PHONY:start
+start:
+	sudo mount floppy.img /mnt/kernel
+	sudo cp hx_kernel /mnt/kernel/hx_kernel
+	sleep 1
+	sudo umount /mnt/kernel
+	sleep 1
+	bochs -f bochsrc.txt

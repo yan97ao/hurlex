@@ -83,18 +83,21 @@ void init_pmm(multiboot_t *mboot_ptr)
 void init_page_pmm(multiboot_t *mboot_ptr)
 {	
 	uint32_t i = mboot_ptr->mmap_addr;
+
 	while (i < mboot_ptr->mmap_addr + mboot_ptr->mmap_length) {
 		mmap_entry_t *map_entry = (mmap_entry_t *)i;
+		
 		// BIOS 探测出的可用内存是包含了我们的内核所在空间的，我们直接舍弃 1 MB 低端区域
-		if (map_entry->type == 1 && map_entry->base_addr_low >= 0x100000) {
+		if (map_entry->type == 1 && map_entry->base_addr_low == 0x100000) {
+			
 			// 把这些内存段，按页存储到页管理栈里
 			uint32_t j = map_entry->base_addr_low;
-			while (j < map_entry->base_addr_low + map_entry->length_low) {
-				// 我们的内核从 0x100000 开始加载，暂时我们粗略的递增 1 MB 跳过内核所在
-				// 当然，这样的方法实在太过于简陋，暂且保留，我们是要改进的
-				if (j == 0x100000) {
-					j += 0x100000;
-				}
+
+			// 我们的内核从 0x100000 开始加载，暂时我们粗略的递增 1 MB 跳过内核所在
+			// 当然，这样的方法实在太过于简陋，暂且保留，我们是要改进的
+			j += 0x100000;
+
+			while (j < map_entry->base_addr_low + map_entry->length_low && j < PMM_MAX) {
 				pmm_free_page(j);
 				j += 0x1000;
 			}

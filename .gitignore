@@ -5,6 +5,7 @@
 # The Program files
 *.img
 hx_kernel
+tags
 
 # Compiled Dynamic libraries
 *.so

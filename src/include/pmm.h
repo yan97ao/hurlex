@@ -25,6 +25,9 @@
 // 我们要能通过这个地址管理所有的内存
 #define PMM_STACK_ADDR 	0xFF000000
 
+// 支持的最大物理内存(512MB)
+#define PMM_MAX 0x20000000
+
 // 初始化物理内存管理
 void init_pmm(multiboot_t *mboot_ptr);
 
