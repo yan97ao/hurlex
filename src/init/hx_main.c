@@ -42,7 +42,6 @@ int hx_main(multiboot_t *mboot_ptr)
 	
 	// 初始化全局段描述符表
 	init_gdt();
-
 	// 初始化全局中断描述符表
 	init_idt();
 
@@ -55,64 +54,19 @@ int hx_main(multiboot_t *mboot_ptr)
 	
 	// 初始化物理内存管理
 	init_pmm(mboot_ptr);
-
 	// 初始化虚拟内存管理
 	init_vmm();
-
-	printk_color(rc_black, rc_cyan, "Start Paging Mode ...\n\n");
-
 	// 初始化物理内存可用页
 	init_page_pmm(mboot_ptr);
-
 	// 初始化内核态堆管理
 	init_heap();
-	
-	printk_color(rc_black, rc_magenta, "Kernel heap created ...\n\n");
-
-//	printk_color(rc_black, rc_magenta, "Test kmalloc() && kfree() now ...\n\n");
-
-//	void *addr1 = kmalloc(50);
-//	printk("kmalloc    50 byte in 0x%X\n", addr1);
-//	void *addr2 = kmalloc(500);
-//	printk("kmalloc   500 byte in 0x%X\n", addr2);
-//	void *addr3 = kmalloc(5000);
-//	printk("kmalloc  5000 byte in 0x%X\n", addr3);
-//	void *addr4 = kmalloc(50000);
-//	printk("kmalloc 50000 byte in 0x%X\n\n", addr4);
-//
-//	printk("free mem in 0x%X\n", addr1);
-//	kfree(addr1);
-//	printk("free mem in 0x%X\n", addr2);
-//	kfree(addr2);
-//	printk("free mem in 0x%X\n", addr3);
-//	kfree(addr3);
-//	printk("free mem in 0x%X\n\n", addr4);
-//	kfree(addr4);
-
 	// 初始化时钟中断
 // 	init_timer(20);
-
 	// 初始化键盘驱动
 	init_keyboard_driver();
 
 	// 解除对 INTR 中断的屏蔽
 	asm volatile("sti");
-
-	char ch;
-	int color = rc_black;
-	while (1) {
-		ch = keyboard_getchar();
-		if (ch) {
-			if (++color == rc_white + 1) {
-				color = rc_black + 1;
-			}
-			if (ch == '\b') {
-				monitor_putc_color(ch, rc_black, color);
-				monitor_putc_color(' ', rc_black, rc_black);
-			}
-			monitor_putc_color(ch, rc_black, color);
-		}
-	}
 
 	return 0;
 }

@@ -38,8 +38,7 @@ char mm_paging_active = 0;
 
 void init_pmm(multiboot_t *mboot_ptr)
 {
-	#ifdef SHOW_MEM_MAP
-	
+#ifdef SHOW_MEM_MAP
 	// 打印 GRUB 提供的 由 BIOS 的反馈内存布局
 	printk("mem_lower: 0x%X\n", mboot_ptr->mem_lower * 1024);
 	printk("mem_upper: 0x%X\n\n", mboot_ptr->mem_upper * 1024);
@@ -59,25 +58,11 @@ void init_pmm(multiboot_t *mboot_ptr)
 				      (unsigned)mmap->type);
 	}
 	printk("\n");
-	#endif
-	
-	uint32_t i = mboot_ptr->mmap_addr;
-	while (i < mboot_ptr->mmap_addr + mboot_ptr->mmap_length) {
-		mmap_entry_t *map_entry = (mmap_entry_t *)i;
-		// 如果是可用内存(按照协议，1 表示可用内存，其它数字指保留区域)
-		// 我们暂时使用 1 MB 以下低端区域即可满足临时的内存需求
-		if (map_entry->type == 1 && map_entry->base_addr_low < 0x100000) {
-			// 因为起始地址必须按照 4KB 对齐，所以和掩码做与运算
-			// 考虑到减少地址值会覆盖原先的数据，所以先增加 4KB 再与运算
-			// 此处至多有 4KB 的内存浪费，但是效率更重要
-			pmm_location = (map_entry->base_addr_low + 0x1000) & PAGE_MASK;
-			return;
-		}
-		// multiboot 规范中大小这项数据不包含指针自身的大小
-		// 所以我们要再加上一个指针大小，真是奇怪的规范 - -
-		i += map_entry->size + sizeof(uint32_t);
-	}
-	panic("Not found 1 MB under memory!");
+#endif
+
+	// 简单起见，内存 0～640 KB 是空闲的
+	// 我们直接把原始的物理内存页管理其实地址设为 0
+	pmm_location = 0;
 }
 
 void init_page_pmm(multiboot_t *mboot_ptr)
@@ -87,6 +72,7 @@ void init_page_pmm(multiboot_t *mboot_ptr)
 	while (i < mboot_ptr->mmap_addr + mboot_ptr->mmap_length) {
 		mmap_entry_t *map_entry = (mmap_entry_t *)i;
 		
+		// 如果是可用内存(按照协议，1 表示可用内存，其它数字指保留区域)
 		// BIOS 探测出的可用内存是包含了我们的内核所在空间的，我们直接舍弃 1 MB 低端区域
 		if (map_entry->type == 1 && map_entry->base_addr_low == 0x100000) {
 			
@@ -102,6 +88,8 @@ void init_page_pmm(multiboot_t *mboot_ptr)
 				j += 0x1000;
 			}
 		}
+		// multiboot 规范中大小这项数据不包含指针自身的大小
+		// 所以我们要再加上一个指针大小，真是奇怪的规范 - -
 		i += map_entry->size + sizeof(uint32_t);
 	}
 }

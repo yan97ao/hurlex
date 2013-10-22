@@ -128,6 +128,9 @@ void map(uint32_t va, uint32_t pa, uint32_t flags)
 
 	// 创建好以后设置页表项，让这个地址所处的那一页内存指向目标物理内存页
 	page_tables[virtual_page] = (pa & PAGE_MASK) | flags;
+
+	// 通知 CPU 更新页表缓存
+	asm volatile ("invlpg (%0)" : : "a" (va));
 }
 
 void unmap(uint32_t va)
