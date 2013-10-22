@@ -83,7 +83,7 @@ void init_page_pmm(multiboot_t *mboot_ptr)
 			// 当然，这样的方法实在太过于简陋，暂且保留，我们是要改进的
 			j += 0x100000;
 
-			while (j < map_entry->base_addr_low + map_entry->length_low && j < PMM_MAX) {
+			while (j < map_entry->base_addr_low + map_entry->length_low && j <= PMM_MAX) {
 				pmm_free_page(j);
 				j += 0x1000;
 			}
@@ -113,6 +113,7 @@ uint32_t pmm_alloc_page()
 
 	// 0x1000 即 4096D，每页内存 4 KB
 	pmm_location += 0x1000;
+
 	return pmm_location;
 }
 
@@ -124,7 +125,7 @@ void pmm_free_page(uint32_t p)
 	
 	// 此处意为存储空闲页面的内存页写满了
 	// 需要映射一页内存来存储索引
-	if (pmm_stack_max <= pmm_stack_loc) {
+	if (pmm_stack_loc == pmm_stack_max) {
 		map(pmm_stack_max, p, PAGE_PRESENT | PAGE_WRITE);
 		pmm_stack_max += 4096;
 	} else {
