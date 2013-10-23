@@ -57,7 +57,7 @@ stop:
 	jmp stop 	; 到这里结束，关机什么的后面再说
 .end:
 
-
+[GLOBAL stack]
 section .bss 		; 未初始化的数据段从这里开始
     resb 32768 		; 这里32KB作为内核栈
 stack:

@@ -25,8 +25,6 @@
 #define HEAP_START 0xD0000000
 
 // 堆结束地址
-//#define HEAP_END   0xFFBFF000
-// 此处有错吧？这个地址岂不是重叠覆盖过了物理内存页的栈管理地址
 #define HEAP_END   0xFF000000
 
 // 内存块管理结构
@@ -46,5 +44,8 @@ void *kmalloc(uint32_t len);
 
 // 内存释放
 void kfree(void *p);
+
+// 测试内核堆申请释放
+void test_heap();
 
 #endif 	// INCLUDE_HEAP_H_

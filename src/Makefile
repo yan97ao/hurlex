@@ -18,7 +18,7 @@ CC = gcc
 LD = ld
 ASM = nasm
 
-C_FLAGS = -c -Wall -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -I include
+C_FLAGS = -c -g -Wall -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -I include
 LD_FLAGS = -T kernel.ld -m elf_i386
 ASM_FLAGS = -f elf
 

@@ -59,7 +59,7 @@ void init_pmm(multiboot_t *mboot_ptr)
 #endif
 
 	// 简单起见，内存 0～640 KB 是空闲的
-	// 我们直接把原始的物理内存页管理其实地址设为 0
+	// 我们直接把原始的物理内存页管理起始地址设为 0
 	pmm_location = 0;
 }
 

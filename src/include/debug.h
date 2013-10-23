@@ -26,4 +26,16 @@
 // 打印当前的段存器值
 void print_cur_status();
 
+#define assert(x)                                       	\
+	do {                                                	\
+		if (!(x)) {                                     \
+			panic("assertion failed: %s", #x);      \
+		}                                               \
+	} while (0)
+
+// 编译期间静态检测
+#define static_assert(x)                                	\
+	switch (x) { case 0: case (x): ; }
+
+
 #endif 	// INCLUDE_DEBUG_H_

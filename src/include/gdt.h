@@ -43,6 +43,6 @@ struct gdt_ptr_t {
 void init_gdt();
 
 // GDT 加载到 GDTR 的函数[汇编实现]
-void gdt_flush(uint32_t);
+extern void gdt_flush(uint32_t);
 
 #endif 	// INCLUDE_GDT_H_
