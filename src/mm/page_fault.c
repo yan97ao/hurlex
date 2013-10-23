@@ -17,8 +17,7 @@
  */
 
 #include "vmm.h"
-#include "panic.h"
-#include "printk.h"
+#include "debug.h"
 
 void page_fault(pt_regs *regs)
 {

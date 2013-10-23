@@ -17,7 +17,7 @@
  */
 
 #include "timer.h"
-#include "printk.h"
+#include "debug.h"
 #include "common.h"
 #include "scheduler.h"
 #include "idt.h"

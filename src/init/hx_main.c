@@ -17,20 +17,15 @@
  */
 
 #include "multiboot.h"
-#include "printk.h"
+#include "debug.h"
 #include "gdt.h"
 #include "idt.h"
 #include "timer.h"
-#include "panic.h"
-#include "elf.h"
-#include "pmm.h"
-#include "vmm.h"
-#include "heap.h"
+#include "keyboard.h"
+#include "mm.h"
 #include "kthread.h"
 #include "scheduler.h"
-#include "keyboard.h"
 #include "spinlock.h"
-#include "debug.h"
 
 // 定义 elf 相关信息数据
 elf_t kernel_elf;
@@ -60,6 +55,9 @@ int hx_main(multiboot_t *mboot_ptr)
 	init_page_pmm(mboot_ptr);
 	// 初始化内核态堆管理
 	init_heap();
+	// 测试内核堆函数
+	test_heap();
+
 	// 初始化时钟中断
 // 	init_timer(20);
 	// 初始化键盘驱动

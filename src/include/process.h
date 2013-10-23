@@ -44,7 +44,7 @@ struct context {
 };
 
 // 进程名
-#define task_NAME_LEN               15
+#define TASK_NAME_LEN               15
 // 最大进程数
 #define MAX_PROCESS                 1024
 // 最大的 PID
@@ -63,7 +63,7 @@ struct task_struct {
 	struct task_struct *parent; 	 // 父进程指针
 	struct task_struct *real_parent; // 真正的父进程指针
 	uint32_t flags;                  // 进程的一些标志
-	char name[PROC_NAME_LEN + 1];    // 进程名
+	char name[TASK_NAME_LEN + 1];    // 进程名
 	struct list_head list; 		 // 进程的链表
 };
 

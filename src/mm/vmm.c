@@ -16,12 +16,10 @@
  * =====================================================================================
  */
 
-#include "string.h"
-#include "printk.h"
-#include "panic.h"
-#include "vmm.h"
-#include "pmm.h"
 #include "idt.h"
+#include "string.h"
+#include "debug.h"
+#include "mm.h"
 
 // 页目录地址
 uint32_t *page_directory = (uint32_t *)PAGE_DIR_VIRTUAL_ADDR;

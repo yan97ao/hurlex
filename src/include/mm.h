@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  debug.h
+ *       Filename:  mm.h
  *
- *    Description:  调试相关的函数
+ *    Description:  内存管理相关代码
  *
  *        Version:  1.0
- *        Created:  2013年10月21日 15时12分48秒
+ *        Created:  2013年10月23日 10时53分44秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -16,14 +16,12 @@
  * =====================================================================================
  */
 
-#ifndef INCLUDE_DEBUG_H_
-#define INCLUDE_DEBUG_H_
+#ifndef INCLUDE_MM_H_
+#define INCLUDE_MM_H_
 
-#include "elf.h"
-#include "panic.h"
-#include "printk.h"
+#include "pmm.h"
+#include "vmm.h"
+#include "heap.h"
 
-// 打印当前的段存器值
-void print_cur_status();
+#endif 	// INCLUDE_MM_H_
 
-#endif 	// INCLUDE_DEBUG_H_

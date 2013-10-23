@@ -31,28 +31,9 @@ static uint32_t heap_max = HEAP_START;
 // 内存块管理头指针
 static header_t *heap_first = 0;
 
-// 测试内核堆
 void init_heap()
 {
-	printk_color(rc_black, rc_magenta, "Test kmalloc() && kfree() now ...\n\n");
 
-	void *addr1 = kmalloc(50);
-	printk("kmalloc    50 byte in 0x%X\n", addr1);
-	void *addr2 = kmalloc(500);
-	printk("kmalloc   500 byte in 0x%X\n", addr2);
-	void *addr3 = kmalloc(5000);
-	printk("kmalloc  5000 byte in 0x%X\n", addr3);
-	void *addr4 = kmalloc(50000);
-	printk("kmalloc 50000 byte in 0x%X\n\n", addr4);
-
-	printk("free mem in 0x%X\n", addr1);
-	kfree(addr1);
-	printk("free mem in 0x%X\n", addr2);
-	kfree(addr2);
-	printk("free mem in 0x%X\n", addr3);
-	kfree(addr3);
-	printk("free mem in 0x%X\n\n", addr4);
-	kfree(addr4);
 }
 
 void *kmalloc(uint32_t len)
@@ -179,5 +160,28 @@ void glue_chunk(header_t *chunk)
 	if (chunk->next == 0) {
 	      free_chunk(chunk);
 	}
+}
+
+void test_heap()
+{
+	printk_color(rc_black, rc_magenta, "Test kmalloc() && kfree() now ...\n\n");
+
+	void *addr1 = kmalloc(50);
+	printk("kmalloc    50 byte in 0x%X\n", addr1);
+	void *addr2 = kmalloc(500);
+	printk("kmalloc   500 byte in 0x%X\n", addr2);
+	void *addr3 = kmalloc(5000);
+	printk("kmalloc  5000 byte in 0x%X\n", addr3);
+	void *addr4 = kmalloc(50000);
+	printk("kmalloc 50000 byte in 0x%X\n\n", addr4);
+
+	printk("free mem in 0x%X\n", addr1);
+	kfree(addr1);
+	printk("free mem in 0x%X\n", addr2);
+	kfree(addr2);
+	printk("free mem in 0x%X\n", addr3);
+	kfree(addr3);
+	printk("free mem in 0x%X\n\n", addr4);
+	kfree(addr4);
 }
 

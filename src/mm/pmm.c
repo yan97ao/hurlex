@@ -17,10 +17,8 @@
  */
 
 #include "common.h"
-#include "printk.h"
-#include "panic.h"
-#include "vmm.h"
-#include "pmm.h"
+#include "debug.h"
+#include "mm.h"
 
 //#define SHOW_MEM_MAP
 
