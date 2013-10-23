@@ -103,7 +103,7 @@ void init_vmm()
 	// 所以我们只要乘以 1024 ，一共乘以 4096，等于左移了 12 位
 	// 这样就自动计算出了目标地址的 页表 自身的数据结构的偏移地址
 	
-	bzero((void *)(page_tables + pt_idx * 1024), 0x1000);
+	bzero((void *)&page_tables[pt_idx * 1024], 0x1000);
 
 	// 设置分页模式开启标记
 	mm_paging_active = 1;
@@ -125,7 +125,7 @@ void map(uint32_t va, uint32_t pa, uint32_t flags)
 		page_directory[pt_idx] = pmm_alloc_page() | PAGE_PRESENT | PAGE_WRITE;
 
 		// 这里不再解释，原理同上
-		bzero((void *)(page_tables + pt_idx * 1024), 0x1000);
+		bzero((void *)&page_tables[pt_idx * 1024], 0x1000);
 	}
 
 	// 创建好以后设置页表项，让这个地址所处的那一页内存指向目标物理内存页
