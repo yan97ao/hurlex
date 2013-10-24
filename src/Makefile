@@ -18,9 +18,9 @@ CC = gcc
 LD = ld
 ASM = nasm
 
-C_FLAGS = -c -g3 -Wall -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -I include
-LD_FLAGS = -T tools/kernel.ld -m elf_i386
-ASM_FLAGS = -f elf
+C_FLAGS = -c -Wall -m32 -ggdb -gstabs+ -nostdinc -fno-builtin -fno-stack-protector -I include
+LD_FLAGS = -T tools/kernel.ld -m elf_i386 -nostblib
+ASM_FLAGS = -f elf -g
 
 all: $(S_OBJECTS) $(C_OBJECTS) link
 
@@ -56,13 +56,17 @@ mount_image:
 umount_image:
 	sudo umount /mnt/kernel
 
-.PHONY:run
-run:
+.PHONY:qemu
+qemu:
+	qemu -fda floppy.img -boot a
+
+.PHONY:bochs
+bochs:
 	bochs -f tools/bochsrc.txt
 
 .PHONY:debug
 debug:
-	gnome-terminal -e "bochs -f tools/bochsrc-dbg.txt"
-	sleep 2
+	gnome-terminal -e "qemu -S -s -fda floppy.img -boot a"
+	sleep 1
 	cgdb -x tools/gdbinit
-	
+
