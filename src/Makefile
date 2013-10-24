@@ -22,7 +22,7 @@ C_FLAGS = -c -Wall -m32 -ggdb -gstabs+ -nostdinc -fno-builtin -fno-stack-protect
 LD_FLAGS = -T tools/kernel.ld -m elf_i386 -nostblib
 ASM_FLAGS = -f elf -g
 
-all: $(S_OBJECTS) $(C_OBJECTS) link
+all: $(S_OBJECTS) $(C_OBJECTS) link update_image
 
 # The automatic variable `$<' is just the first prerequisite
 .c.o:
@@ -66,7 +66,7 @@ bochs:
 
 .PHONY:debug
 debug:
-	gnome-terminal -e "qemu -S -s -fda floppy.img -boot a"
+	qemu -S -s -fda floppy.img -boot a &
 	sleep 1
 	cgdb -x tools/gdbinit
 
