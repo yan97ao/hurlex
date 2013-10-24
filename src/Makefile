@@ -18,8 +18,8 @@ CC = gcc
 LD = ld
 ASM = nasm
 
-C_FLAGS = -c -g -Wall -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -I include
-LD_FLAGS = -T kernel.ld -m elf_i386
+C_FLAGS = -c -g3 -Wall -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -I include
+LD_FLAGS = -T tools/kernel.ld -m elf_i386
 ASM_FLAGS = -f elf
 
 all: $(S_OBJECTS) $(C_OBJECTS) link
@@ -58,13 +58,11 @@ umount_image:
 
 .PHONY:run
 run:
-	bochs -f bochsrc.txt
+	bochs -f tools/bochsrc.txt
 
-.PHONY:start
-start:
-	sudo mount floppy.img /mnt/kernel
-	sudo cp hx_kernel /mnt/kernel/hx_kernel
-	sleep 1
-	sudo umount /mnt/kernel
-	sleep 1
-	bochs -f bochsrc.txt
+.PHONY:debug
+debug:
+	gnome-terminal -e "bochs -f tools/bochsrc-dbg.txt"
+	sleep 2
+	cgdb -x tools/gdbinit
+	
