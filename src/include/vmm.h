@@ -21,6 +21,7 @@
 
 #include "types.h"
 #include "idt.h"
+#include "list.h"
 
 // 页目录虚拟地址
 #define PAGE_DIR_VIRTUAL_ADDR   	0xFFBFF000
@@ -87,5 +88,27 @@ char get_mapping(uint32_t va, uint32_t *pa);
 
 // 页错误中断的函数处理
 void page_fault(pt_regs *regs);
+
+// 任务内存映射结构前置声明
+struct mm_struct;
+
+// 一段线性空间的描述
+struct vma_struct {
+	struct mm_struct *vm_mm;
+	uint32_t vm_start;
+	uint32_t vm_end;
+	uint32_t vm_flags;
+	struct list_head list_link;
+};
+
+// flags 位的定义
+#define VM_READ 	0x00000001 	// 只读
+#define VM_WRITE 	0x00000002 	// 可读写
+#define VM_EXEC 	0x00000004 	// 可执行
+
+// 任务内存映射结构
+struct mm_struct {
+	struct vma_struct *vma;
+};
 
 #endif 	// INCLUDE_VMM_H
