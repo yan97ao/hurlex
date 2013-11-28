@@ -6,7 +6,7 @@
  *    Description:  PIT 相关
  *
  *        Version:  1.0
- *        Created:  2013年07月27日 09时27分11秒
+ *        Created:  2013年11月16日 11时27分11秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -19,16 +19,13 @@
 #include "timer.h"
 #include "debug.h"
 #include "common.h"
-#include "scheduler.h"
 #include "idt.h"
+#include "sched.h"
 
 void timer_callback(pt_regs *regs)
 {
-	//static uint32_t tick = 0;
-	//tick++;
-	//printk_color(rc_black, rc_red, "Tick: %d\n", tick);
-	
-	// 进行内核线程的调度
+//	static uint32_t tick = 0;
+//	printk_color(rc_black, rc_red, "Tick: %d\n", tick++);
 	schedule();
 }
 

@@ -6,7 +6,7 @@
  *    Description:  定义 PIT(周期中断定时器) 相关函数
  *
  *        Version:  1.0
- *        Created:  2013年07月27日 09时25分04秒
+ *        Created:  2013年11月16日 11时26分04秒
  *       Revision:  none
  *       Compiler:  gcc
  *

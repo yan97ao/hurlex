@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  monitor.h
+ *       Filename:  console.h
  *
  *    Description:  屏幕操作的相关函数的头文件
  *
  *        Version:  1.0
- *        Created:  2013年07月24日 20时53分58秒
+ *        Created:  2013年11月02日 21时55分58秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -16,9 +16,8 @@
  * =====================================================================================
  */
 
-#ifndef INCLUDE_MONITOR_H_
-
-#define INCLUDE_MONITOR_H_
+#ifndef INCLUDE_CONSOLE_H_
+#define INCLUDE_CONSOLE_H_
 
 #include "types.h"
 
@@ -43,21 +42,21 @@ enum real_color {
 } real_color_t;
 
 // 清屏操作
-void monitor_clear();
+void console_clear();
 
 // 屏幕输出一个字符(带颜色)
-void monitor_putc_color(char c, real_color_t back, real_color_t fore);
+void console_putc_color(char c, real_color_t back, real_color_t fore);
 
 // 屏幕打印一个以 \0 结尾的字符串(默认黑底白字)
-void monitor_write(char *cstr);
+void console_write(char *cstr);
 
 // 屏幕打印一个以 \0 结尾的字符串(带颜色)
-void monitor_write_color(char *cstr, real_color_t back, real_color_t fore);
+void console_write_color(char *cstr, real_color_t back, real_color_t fore);
 
 // 屏幕输出一个十六进制的整型数
-void monitor_write_hex(uint32_t n, real_color_t back, real_color_t fore);
+void console_write_hex(uint32_t n, real_color_t back, real_color_t fore);
 
-// 屏幕输出一个十进制的整形数
-void monitor_write_dec(uint32_t n, real_color_t back, real_color_t fore);
+// 屏幕输出一个十进制的整型数
+void console_write_dec(uint32_t n, real_color_t back, real_color_t fore);
 
-#endif  // INCLUDE_MONITOR_H_
+#endif  // INCLUDE_CONSOLE_H_

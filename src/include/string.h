@@ -6,7 +6,7 @@
  *    Description:  字符串处理函数
  *
  *        Version:  1.0
- *        Created:  2013年07月26日 20时12分44秒
+ *        Created:  2013年11月06日 20时12分44秒
  *       Revision:  none
  *       Compiler:  gcc
  *

@@ -6,7 +6,7 @@
  *    Description:  内核的简单堆管理
  *
  *        Version:  1.0
- *        Created:  2013年10月05日 14时57分29秒
+ *        Created:  2013年11月18日 14时57分29秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -15,25 +15,31 @@
  *
  * =====================================================================================
  */
-
-#include "heap.h"
+#include "debug.h"
 #include "pmm.h"
 #include "vmm.h"
-#include "printk.h"
+#include "heap.h"
 
+// 申请内存块
 static void alloc_chunk(uint32_t start, uint32_t len);
+
+// 释放内存块
 static void free_chunk(header_t *chunk);
+
+// 切分内存块
 static void split_chunk(header_t *chunk, uint32_t len);
+
+// 合并内存块
 static void glue_chunk(header_t *chunk);
 
 static uint32_t heap_max = HEAP_START;
 
 // 内存块管理头指针
-static header_t *heap_first = 0;
+static header_t *heap_first;
 
 void init_heap()
 {
-
+	heap_first = 0;
 }
 
 void *kmalloc(uint32_t len)
@@ -64,7 +70,7 @@ void *kmalloc(uint32_t len)
 	// 第一次执行该函数则初始化内存块起始位置
 	// 之后根据当前指针加上申请的长度即可
 	if (prev_header) {
-	      chunk_start = (uint32_t)prev_header + prev_header->length;
+		chunk_start = (uint32_t)prev_header + prev_header->length;
 	} else {
 		chunk_start = HEAP_START;
 		heap_first = (header_t *)chunk_start;
@@ -101,26 +107,26 @@ void alloc_chunk(uint32_t start, uint32_t len)
 	// 必须循环申请内存页直到有到足够的可用内存
 	while (start + len > heap_max) {
 		uint32_t page = pmm_alloc_page();
-		map(heap_max, page, PAGE_PRESENT | PAGE_WRITE);
-		heap_max += 0x1000;
+		map(pgd_kern, heap_max, page, PAGE_PRESENT | PAGE_WRITE);
+		heap_max += PAGE_SIZE;
 	}
 }
 
 void free_chunk(header_t *chunk)
 {
 	if (chunk->prev == 0) {
-	      heap_first = 0;
+		heap_first = 0;
 	} else {
 		chunk->prev->next = 0;
 	}
 
 	// 空闲的内存超过 1 页的话就释放掉
-	while ((heap_max - 0x1000) >= (uint32_t)chunk) {
-		heap_max -= 0x1000;
+	while ((heap_max - PAGE_SIZE) >= (uint32_t)chunk) {
+		heap_max -= PAGE_SIZE;
 		uint32_t page;
-		get_mapping(heap_max, &page);
+		get_mapping(pgd_kern, heap_max, &page);
+		unmap(pgd_kern, heap_max);
 		pmm_free_page(page);
-		unmap(heap_max);
 	}
 }
 
@@ -144,7 +150,9 @@ void glue_chunk(header_t *chunk)
 	// 如果该内存块后面有链内存块且未被使用则拼合
 	if (chunk->next && chunk->next->allocated == 0) {
 		chunk->length = chunk->length + chunk->next->length;
-		chunk->next->next->prev = chunk;
+		if (chunk->next->next) {
+			chunk->next->next->prev = chunk;
+		}
 		chunk->next = chunk->next->next;
 	}
 
@@ -152,13 +160,15 @@ void glue_chunk(header_t *chunk)
 	if (chunk->prev && chunk->prev->allocated == 0) {
 		chunk->prev->length = chunk->prev->length + chunk->length;
 		chunk->prev->next = chunk->next;
-		chunk->next->prev = chunk->prev;
+		if (chunk->next) {
+			chunk->next->prev = chunk->prev;
+		}
 		chunk = chunk->prev;
 	}
 
 	// 假如该内存后面没有链表内存块了直接释放掉
 	if (chunk->next == 0) {
-	      free_chunk(chunk);
+		free_chunk(chunk);
 	}
 }
 

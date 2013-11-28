@@ -6,7 +6,7 @@
  *    Description:  页错误处理函数
  *
  *        Version:  1.0
- *        Created:  2013年10月17日 14时23分31秒
+ *        Created:  2013年11月17日 16时54分53秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -24,7 +24,7 @@ void page_fault(pt_regs *regs)
 	uint32_t cr2;
 	asm volatile ("mov %%cr2, %0" : "=r" (cr2));
 
-	printk("Page fault at 0x%x, virtual faulting address 0x%x\n", regs->eip, cr2);
+	printk("Page fault at EIP: 0x%x, virtual faulting address 0x%x\n", regs->eip, cr2);
 	printk("Error code: %x\n", regs->err_code);
 
 	// bit 0 为 0 指页面不存在内存里
@@ -52,8 +52,6 @@ void page_fault(pt_regs *regs)
 		printk_color(rc_black, rc_red, "The fault occurred during an instruction fetch.\n");
 	}
 
-	//panic("Page Error:");
-	
 	while (1);
 }
 

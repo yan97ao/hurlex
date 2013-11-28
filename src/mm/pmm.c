@@ -6,7 +6,7 @@
  *    Description:  页内存管理
  *
  *        Version:  1.0
- *        Created:  2013年09月26日 19时45分26秒
+ *        Created:  2013年11月16日 12时00分35秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -16,121 +16,75 @@
  * =====================================================================================
  */
 
+#include "multiboot.h"
 #include "common.h"
 #include "debug.h"
-#include "mm.h"
+#include "pmm.h"
 
-//#define SHOW_MEM_MAP
+// 物理内存页面管理的栈
+static uint32_t pmm_stack[PAGE_MAX_SIZE+1];
 
-// 当前申请到的位置
-uint32_t pmm_stack_loc = PMM_STACK_ADDR;
+// 物理内存管理的栈指针
+static uint32_t pmm_stack_top;
 
-// 内存申请的界限位置
-uint32_t pmm_stack_max = PMM_STACK_ADDR;
+// 物理内存页的数量
+uint32_t phy_page_count;
 
-// 没有开启分页机制时的内存管理方案采用的管理指针
-uint32_t pmm_location;
-
-// 是否开启内存分页
-char mm_paging_active = 0;
-
-void init_pmm(multiboot_t *mboot_ptr)
+void show_memory_map()
 {
-#ifdef SHOW_MEM_MAP
-	// 打印 GRUB 提供的 由 BIOS 的反馈内存布局
-	printk("mem_lower: 0x%X\n", mboot_ptr->mem_lower * 1024);
-	printk("mem_upper: 0x%X\n\n", mboot_ptr->mem_upper * 1024);
+	uint32_t mmap_addr = glb_mboot_ptr->mmap_addr;
+	uint32_t mmap_length = glb_mboot_ptr->mmap_length;
 
-	mmap_entry_t *mmap;
-	printk("mmap_addr = 0x%X, mmap_length = 0x%X\n\n", (unsigned)mboot_ptr->mmap_addr, (unsigned)mboot_ptr->mmap_length);
-	for (mmap = (mmap_entry_t *) mboot_ptr->mmap_addr;
-		(unsigned long) mmap < mboot_ptr->mmap_addr + mboot_ptr->mmap_length; 
-		mmap = (mmap_entry_t *)((unsigned long)mmap + mmap->size + sizeof(mmap->size))) {
-	      printk("  size = 0x%X, base_addr = 0x%X%X,"
-				      " length = 0x%X%X, type = 0x%X\n",
-				      (unsigned)mmap->size,
-				      (unsigned)mmap->base_addr_high,
-				      (unsigned)mmap->base_addr_low,
-				      (unsigned)mmap->length_high,
-				      (unsigned)mmap->length_low,
-				      (unsigned)mmap->type);
+	printk("Memory map:\n");
+
+	mmap_entry_t *mmap = (mmap_entry_t *)mmap_addr;
+	for (mmap = (mmap_entry_t *)mmap_addr; (uint32_t)mmap < mmap_addr + mmap_length; mmap++) {
+		printk("base_addr = 0x%X%08X, length = 0x%X%08X, type = 0x%X\n",
+			(uint32_t)mmap->base_addr_high, (uint32_t)mmap->base_addr_low,
+			(uint32_t)mmap->length_high, (uint32_t)mmap->length_low,
+			(uint32_t)mmap->type);
 	}
-	printk("\n");
-#endif
-
-	// 简单起见，内存 0～640 KB 是空闲的
-	// 我们直接把原始的物理内存页管理起始地址设为 0
-	pmm_location = 0;
 }
 
-void init_page_pmm(multiboot_t *mboot_ptr)
-{	
-	uint32_t i = mboot_ptr->mmap_addr;
+void init_pmm()
+{
+	mmap_entry_t *mmap_start_addr = (mmap_entry_t *)glb_mboot_ptr->mmap_addr;
+	mmap_entry_t *mmap_end_addr = (mmap_entry_t *)glb_mboot_ptr->mmap_addr + glb_mboot_ptr->mmap_length;
 
-	while (i < mboot_ptr->mmap_addr + mboot_ptr->mmap_length) {
-		mmap_entry_t *map_entry = (mmap_entry_t *)i;
-		
-		// 如果是可用内存(按照协议，1 表示可用内存，其它数字指保留区域)
-		// BIOS 探测出的可用内存是包含了我们的内核所在空间的，我们直接舍弃 1 MB 低端区域
+	mmap_entry_t *map_entry;
+
+	for (map_entry = mmap_start_addr; map_entry < mmap_end_addr; map_entry++) {
+
+		// 如果是可用内存 ( 按照协议，1 表示可用内存，其它数字指保留区域 )
 		if (map_entry->type == 1 && map_entry->base_addr_low == 0x100000) {
 			
-			// 把这些内存段，按页存储到页管理栈里
-			uint32_t j = map_entry->base_addr_low;
+			// 把内核结束位置到结束位置的内存段，按页存储到页管理栈里
+			// 最多支持512MB的物理内存
+			uint32_t page_addr = map_entry->base_addr_low + (uint32_t)(kern_end - kern_start);
+			uint32_t length = map_entry->base_addr_low + map_entry->length_low;
 
-			// 我们的内核从 0x100000 开始加载，暂时我们粗略的递增 1 MB 跳过内核所在
-			// 当然，这样的方法实在太过于简陋，暂且保留，我们是要改进的
-			j += 0x100000;
-
-			while (j < map_entry->base_addr_low + map_entry->length_low && j <= PMM_MAX) {
-				pmm_free_page(j);
-				j += 0x1000;
+			while (page_addr < length && page_addr <= PMM_MAX_SIZE) {
+				pmm_free_page(page_addr);
+				page_addr += PMM_PAGE_SIZE;
+				phy_page_count++;
 			}
 		}
-		// multiboot 规范中大小这项数据不包含指针自身的大小
-		// 所以我们要再加上一个指针大小，真是奇怪的规范 - -
-		i += map_entry->size + sizeof(uint32_t);
 	}
 }
 
 uint32_t pmm_alloc_page()
 {
-	// 根据是否开启分页决定对内存的管理策略
-	if (mm_paging_active) {
-		// 确认栈地址没有下溢
-		// 在分页开启以后，需要先收集空闲内存放入管理栈才可以进一步申请内存
-		// 否则之掉调用申请内存页会出错
-		if (pmm_stack_loc == PMM_STACK_ADDR) {
-			panic("Error: Out of Memory!");
-		}
-		// 相当于出栈
-		pmm_stack_loc -= sizeof(uint32_t);
-		uint32_t *stack = (uint32_t *)pmm_stack_loc;
+	assert(pmm_stack_top != 0, "out of memory");
 
-		return *stack;
-	}
+	uint32_t page = pmm_stack[pmm_stack_top--];
 
-	// 0x1000 即 4096D，每页内存 4 KB
-	pmm_location += 0x1000;
-
-	return pmm_location;
+	return page;
 }
 
 void pmm_free_page(uint32_t p)
 {
-	if (p < pmm_location) {
-		return;
-	}
-	
-	// 此处意为存储空闲页面的内存页写满了
-	// 需要映射一页内存来存储索引
-	if (pmm_stack_loc == pmm_stack_max) {
-		map(pmm_stack_max, p, PAGE_PRESENT | PAGE_WRITE);
-		pmm_stack_max += 4096;
-	} else {
-		// 将这个空闲的内存页地址存入管理栈
-		uint32_t *stack = (uint32_t*)pmm_stack_loc;
-		*stack = p;
-		pmm_stack_loc += sizeof(uint32_t);
-	}
+	assert(pmm_stack_top != PAGE_MAX_SIZE, "out of pmm_stack stack");
+
+	pmm_stack[++pmm_stack_top] = p;
 }
 

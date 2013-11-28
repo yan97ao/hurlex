@@ -6,7 +6,7 @@
  *    Description:  一些类型的定义
  *
  *        Version:  1.0
- *        Created:  2013年10月21日 16时28分07秒
+ *        Created:  2013年10月31日 16时28分07秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -35,7 +35,6 @@ typedef          short int16_t;
 typedef unsigned char  uint8_t;
 typedef          char  int8_t;
 
-// 进程标识符
-typedef uint32_t pid_t;
+typedef int32_t pid_t;
 
 #endif 	// INCLUDE_TYPES_H_

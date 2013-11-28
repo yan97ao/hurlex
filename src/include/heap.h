@@ -6,7 +6,7 @@
  *    Description:  简单的内核堆管理
  *
  *        Version:  1.0
- *        Created:  2013年10月05日 14时53分35秒
+ *        Created:  2013年11月08日 16时53分35秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -21,11 +21,8 @@
 
 #include "types.h"
 
-// 堆开始地址
-#define HEAP_START 0xD0000000
-
-// 堆结束地址
-#define HEAP_END   0xFF000000
+// 堆起始地址
+#define HEAP_START 0xE0000000
 
 // 内存块管理结构
 typedef

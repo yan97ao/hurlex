@@ -6,7 +6,7 @@
  *    Description:  可变形参表相关的宏定义
  *
  *        Version:  1.0
- *        Created:  2013年09月20日 12时12分19秒
+ *        Created:  2013年11月06日 12时12分19秒
  *       Revision:  none
  *       Compiler:  gcc
  *

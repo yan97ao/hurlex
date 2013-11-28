@@ -6,7 +6,7 @@
  *    Description:  ELF 格式的部分定义
  *
  *        Version:  1.0
- *        Created:  2013年09月22日 12时47分12秒
+ *        Created:  2013年11月06日 12时47分12秒
  *       Revision:  none
  *       Compiler:  gcc
  *

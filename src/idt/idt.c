@@ -6,7 +6,7 @@
  *    Description:  中断描述符与中断相关的函数定义
  *
  *        Version:  1.0
- *        Created:  2013年07月26日 18时38分33秒
+ *        Created:  2013年11月12日 20时10分55秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -145,11 +145,11 @@ static void idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags
 
 	// 先留下 0x60 这个魔数，以后实现用户态时候
 	// 这个与运算可以设置中断门的特权级别为 3
-	idt_entries[num].flags = flags;  // | 0x60
+	idt_entries[num].flags = flags | 0x60;
 }
 
 // 调用中断处理函数
-void idt_handler(pt_regs *regs)
+void isr_handler(pt_regs *regs)
 {
 	if (interrupt_handlers[regs->int_no]) {
 	      interrupt_handlers[regs->int_no](regs);
@@ -170,7 +170,7 @@ void irq_handler(pt_regs *regs)
 	// 发送中断结束信号给 PICs
 	// 按照我们的设置，从 32 号中断起为用户自定义中断
 	// 因为单片的 Intel 8259A 芯片只能处理 8 级中断
-	// 故大于等于 40 的终端号是由从片处理的
+	// 故大于等于 40 的中断号是由从片处理的
 	if (regs->int_no >= 40) {
 		// 发送重设信号给从片
 		outb(0xA0, 0x20);

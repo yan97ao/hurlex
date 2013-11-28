@@ -6,7 +6,7 @@
  *    Description:  全局描述符表相关函数
  *
  *        Version:  1.0
- *        Created:  2013年07月26日 17时09分54秒
+ *        Created:  2013年11月07日  17时09分54秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -18,6 +18,8 @@
 
 #include "gdt.h"
 #include "tss.h"
+#include "pmm.h"
+#include "vmm.h"
 #include "string.h"
 
 // 全局描述符表长度
@@ -35,11 +37,8 @@ tss_entry_t tss_entry;
 // 全局描述符表构造函数，根据下标构造
 static void gdt_set_gate(int32_t num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran);
 
-// 初始化任务段描述符
+// TSS 段构造函数
 static void tss_set_gate(int32_t num, uint16_t ss0, uint32_t esp0);
-
-// 声明内核栈地址
-extern uint32_t stack;
 
 // 初始化全局描述符表
 void init_gdt()
@@ -49,18 +48,18 @@ void init_gdt()
 	gdt_ptr.base = (uint32_t)&gdt_entries;
 
 	// 采用 Intel 平坦模型
-	gdt_set_gate(0, 0, 0, 0, 0);             	// 按照 Intel 文档要求，第一个描述符必须全 0
-	gdt_set_gate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF); 	// 指令段
-	gdt_set_gate(2, 0, 0xFFFFFFFF, 0x92, 0xCF); 	// 数据段
-	gdt_set_gate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF); 	// 用户模式代码段
-	gdt_set_gate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF); 	// 用户模式数据段
+	gdt_set_gate(SEG_NULL,  0x0, 0x0, 0x0, 0x0); 	// 按照 Intel 文档要求，第一个描述符必须全 0
+	gdt_set_gate(SEG_KTEXT, 0x0, 0xFFFFFFFF, 0x9A, 0xCF); 	// 内核指令段
+	gdt_set_gate(SEG_KDATA, 0x0, 0xFFFFFFFF, 0x92, 0xCF); 	// 内核数据段
+	gdt_set_gate(SEG_UTEXT, 0x0, 0xFFFFFFFF, 0xFA, 0xCF); 	// 用户模式代码段
+	gdt_set_gate(SEG_UDATA, 0x0, 0xFFFFFFFF, 0xF2, 0xCF); 	// 用户模式数据段
 
-	tss_set_gate(5, 0x10, stack);
+	tss_set_gate(SEG_TSS, KERNEL_DS, 0);
 
 	// 加载全局描述符表地址到 GPTR 寄存器
 	gdt_flush((uint32_t)&gdt_ptr);
 
-	// 加载 TSS 段信息
+	// 加载任务寄存器
 	tss_flush();
 }
 
@@ -96,26 +95,29 @@ static void tss_set_gate(int32_t num, uint16_t ss0, uint32_t esp0)
 	uint32_t base = (uint32_t)&tss_entry;
 	uint32_t limit = base + sizeof(tss_entry);
 
-	// 现在在 GDT 表中增加我们的 TSS 段描述
+	// 在 GDT 表中增加 TSS 段描述
 	gdt_set_gate(num, base, limit, 0xE9, 0x00);
 
 	// TSS 段清 0
 	bzero(&tss_entry, sizeof(tss_entry));
 
 	// 设置内核栈的地址
-	tss_entry.ss0  = ss0;
-	tss_entry.esp0 = esp0;
+	tss_entry.ts_ss0  = ss0;
+	tss_entry.ts_esp0 = esp0;
 
-	// 最后我们设置 cs、ss、ds、es、fs 和 gs 段
-	// 我们的之前的内核代码段选择子是 0x8、数据段选择子是0x10
+	// 之前的内核代码段选择子是 0x8 、数据段选择子是 0x10
 	// 但是现在要设置选择子的低位的 RPL 为 11(3) 了
 	// 含义是 TSS 可以从 ring3 切换过来，所以 0x8 和 0x10 变成了 0x0b和 0x13
-	tss_entry.cs = 0x0b;     
-	tss_entry.ss = tss_entry.ds = tss_entry.es = tss_entry.fs = tss_entry.gs = 0x13;
+	tss_entry.ts_cs = 0x0b;
+	tss_entry.ts_ss = 0x13;
+	tss_entry.ts_ds = 0x13;
+	tss_entry.ts_es = 0x13;
+	tss_entry.ts_fs = 0x13;
+	tss_entry.ts_gs = 0x13;
 }
 
-void set_kernel_stack(uint32_t stack)
+void load_kern_esp(uint32_t esp0)
 {
-	tss_entry.esp0 = stack;
+    tss_entry.ts_esp0 = esp0;
 }
 

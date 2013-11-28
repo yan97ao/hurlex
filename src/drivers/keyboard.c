@@ -6,7 +6,7 @@
  *    Description:  键盘驱动程序
  *
  *        Version:  1.0
- *        Created:  2013年10月16日 17时56分36秒
+ *        Created:  2013年11月28日 17时56分36秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -38,25 +38,25 @@ keymap_t us = {
 		'*',
 
 		/* Special keys */
-		0, //ALT - 56
+		0,    // ALT - 56
 		' ', // Space - 57
-		0, //Caps lock - 58
+		0,    // Caps lock - 58
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // F1 to F10 - 59 to 68
-		0, //Num lock - 69
-		0, //Scroll lock - 70
-		0, //Home - 71
-		0, //Up arrow - 72
-		0, //Page up - 73
+		0, // Num lock - 69
+		0, // Scroll lock - 70
+		0, // Home - 71
+		0, // Up arrow - 72
+		0, // Page up - 73
 		'-',
-		0, //Left arrow - 75
+		0, // Left arrow - 75
 		0,
-		0, //Right arrow -77
+		0, // Right arrow -77
 		'+',
-		0, //End - 79
-		0, //Dowm arrow - 80
-		0, //Page down - 81
-		0, //Insert - 82
-		0, //Delete - 83
+		0, // End - 79
+		0, // Dowm arrow - 80
+		0, // Page down - 81
+		0, // Insert - 82
+		0, // Delete - 83
 		0, 0, 0,
 		0, // F11 - 87
 		0, // F12 - 88

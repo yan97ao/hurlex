@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  monitor.c
+ *       Filename:  console.c
  *
  *    Description:  屏幕操作的一些函数实现
  *
  *        Version:  1.0
- *        Created:  2013年07月24日 20时58分00秒
+ *        Created:  2013年11月02日 21时58分00秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -16,8 +16,9 @@
  * =====================================================================================
  */
 
-#include "monitor.h"
+#include "console.h"
 #include "common.h"
+#include "vmm.h"
 
 /*
  * VGA(Video Graphics Array，视频图形阵列)是使用模拟信号的一种视频传输标准，内核可以通过它来控制屏幕上字符或者图形的显示。
@@ -27,7 +28,7 @@
  */
 
 // VGA 的显示缓冲的起点是 0xB8000
-static uint16_t *video_memory = (uint16_t *)0xB8000;
+static uint16_t *video_memory = (uint16_t *)(0xB8000 + PAGE_OFFSET);
 
 // 屏幕"光标"的坐标
 static uint8_t cursor_x = 0;
@@ -76,7 +77,7 @@ static void scroll()
 }
 
 // 清屏操作
-void monitor_clear()
+void console_clear()
 {
 	uint8_t attribute_byte = (0 << 4) | (15 & 0x0F);
 	uint16_t blank = 0x20 | (attribute_byte << 8);
@@ -92,7 +93,7 @@ void monitor_clear()
 }
 
 // 屏幕输出一个字符(带颜色)
-void monitor_putc_color(char c, real_color_t back, real_color_t fore)
+void console_putc_color(char c, real_color_t back, real_color_t fore)
 {
 	uint8_t back_color = (uint8_t)back;
 	uint8_t fore_color = (uint8_t)fore;
@@ -125,33 +126,33 @@ void monitor_putc_color(char c, real_color_t back, real_color_t fore)
 	// 如果需要的话滚动屏幕显示
 	scroll();
 
-	// 移动硬件的输出 "光标"
+	// 移动硬件的输入光标
 	move_cursor();
 }
 
 // 屏幕打印一个以 \0 结尾的字符串(默认黑底白字)
-void monitor_write(char *cstr)
+void console_write(char *cstr)
 {
 	while (*cstr) {
-	      monitor_putc_color(*cstr++, rc_black, rc_white);
+	      console_putc_color(*cstr++, rc_black, rc_white);
 	}
 }
 
 // 屏幕打印一个以 \0 结尾的字符串(带颜色)
-void monitor_write_color(char *cstr, real_color_t back, real_color_t fore)
+void console_write_color(char *cstr, real_color_t back, real_color_t fore)
 {
 	while (*cstr) {
-	      monitor_putc_color(*cstr++, back, fore);
+	      console_putc_color(*cstr++, back, fore);
 	}
 }
 
 // 屏幕输出一个十六进制的整型数
-void monitor_write_hex(uint32_t n, real_color_t back, real_color_t fore)
+void console_write_hex(uint32_t n, real_color_t back, real_color_t fore)
 {
 	int tmp;
 	char noZeroes = 1;
 
-	monitor_write_color("0x", back, fore);
+	console_write_color("0x", back, fore);
 
 	int i;
 	for (i = 28; i >= 0; i -= 4) {
@@ -161,18 +162,18 @@ void monitor_write_hex(uint32_t n, real_color_t back, real_color_t fore)
 		}
 		noZeroes = 0;
 		if (tmp >= 0xA) {
-		      monitor_putc_color(tmp-0xA+'a', back, fore);
+		      console_putc_color(tmp-0xA+'a', back, fore);
 		} else {
-		      monitor_putc_color(tmp+'0', back, fore);
+		      console_putc_color(tmp+'0', back, fore);
 		}
 	}
 }
 
-// 屏幕输出一个十进制的整形数
-void monitor_write_dec(uint32_t n, real_color_t back, real_color_t fore)
+// 屏幕输出一个十进制的整型数
+void console_write_dec(uint32_t n, real_color_t back, real_color_t fore)
 {
 	if (n == 0) {
-		monitor_putc_color('0', back, fore);
+		console_putc_color('0', back, fore);
 		return;
 	}
 
@@ -194,6 +195,6 @@ void monitor_write_dec(uint32_t n, real_color_t back, real_color_t fore)
 	      c2[i--] = c[j++];
 	}
 
-	monitor_write_color(c2, back, fore);
+	console_write_color(c2, back, fore);
 }
 

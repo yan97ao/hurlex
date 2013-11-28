@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  scheduler.h
+ *       Filename:  sched.h
  *
  *    Description:  内核的线程调度
  *
  *        Version:  1.0
- *        Created:  2013年10月10日 16时07分43秒
+ *        Created:  2013年11月22日 16时07分43秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -19,25 +19,27 @@
 #ifndef INCLUDE_SCHEDULER_H_
 #define INCLUDE_SCHEDULER_H_
 
-#include "types.h"
-#include "kthread.h"
+#include "task.h"
 
-typedef
-struct thread_list {
-	thread_t *thread;
-	struct thread_list *next;
-} thread_list_t;
+// 可调度进程链表
+extern struct task_struct *running_proc_head;
 
-// 初始化线程调度
-void init_scheduler(thread_t *initial_thread);
+// 等待进程链表
+extern struct task_struct *wait_proc_head;
 
-// 线程就绪
-void thread_is_ready(thread_t *t);
+// 当前运行的任务
+extern struct task_struct *current;
 
-// 线程非就绪
-void thread_not_ready(thread_t *t);
+// 初始化任务调度
+void init_sched();
 
-// 调度线程
+// 任务调度
 void schedule();
+
+// 任务切换准备
+void change_task_to(struct task_struct *next);
+
+// 任务切换
+void switch_to(struct context *prev, struct context *next);
 
 #endif 	// INCLUDE_SCHEDULER_H_

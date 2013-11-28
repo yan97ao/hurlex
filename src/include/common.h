@@ -6,7 +6,7 @@
  *    Description:  一些类型的定义
  *
  *        Version:  1.0
- *        Created:  2013年07月24日 20时07分26秒
+ *        Created:  2013年11月01日 10时07分26秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -29,5 +29,11 @@ uint8_t inb(uint16_t port);
 
 // 端口读一个字
 uint16_t inw(uint16_t port);
+
+// 开启中断
+inline void enable_intr();
+
+// 关闭中断
+inline void disable_intr();
 
 #endif // INCLUDE_COMMON_H_

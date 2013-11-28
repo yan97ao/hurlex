@@ -6,7 +6,7 @@
  *    Description:  内核的打印函数
  *
  *        Version:  1.0
- *        Created:  2013年09月20日 12时06分00秒
+ *        Created:  2013年11月06日 12时06分00秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -16,10 +16,12 @@
  * =====================================================================================
  */
 
-#include "monitor.h"
+#include "console.h"
 #include "string.h"
 #include "vargs.h"
-#include "printk.h"
+#include "debug.h"
+
+static int vsprintf(char *buff, const char *format, va_list args);
 
 void printk(const char *format, ...)
 {
@@ -34,7 +36,7 @@ void printk(const char *format, ...)
 
 	buff[i] = '\0';
 
-	monitor_write(buff);
+	console_write(buff);
 }
 
 void printk_color(real_color_t back, real_color_t fore, const char *format, ...)
@@ -50,7 +52,7 @@ void printk_color(real_color_t back, real_color_t fore, const char *format, ...)
 
 	buff[i] = '\0';
 
-	monitor_write_color(buff, back, fore);
+	console_write_color(buff, back, fore);
 }
 
 #define is_digit(c)	((c) >= '0' && (c) <= '9')
@@ -162,7 +164,7 @@ static char *number(char *str, int num, int base, int size, int precision, int t
 	return str;
 }
 
-int vsprintf(char *buff, const char *format, va_list args)
+static int vsprintf(char *buff, const char *format, va_list args)
 {
 	int len;
 	int i;

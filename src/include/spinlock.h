@@ -6,7 +6,7 @@
  *    Description:  内核自旋锁
  *
  *        Version:  1.0
- *        Created:  2013年10月17日 19时20分31秒
+ *        Created:  2013年11月23日 20时51分31秒
  *       Revision:  none
  *       Compiler:  gcc
  *

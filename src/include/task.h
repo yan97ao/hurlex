@@ -6,7 +6,7 @@
  *    Description:  进程管理相关的定义
  *
  *        Version:  1.0
- *        Created:  2013年10月21日 16时18分41秒
+ *        Created:  2013年11月20日 09时18分41秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -16,18 +16,12 @@
  * =====================================================================================
  */
 
-#ifndef INCLUDE_PROCESS_H_
-#define INCLUDE_PROCESS_H_
+#ifndef INCLUDE_TASK_H_
+#define INCLUDE_TASK_H_
 
 #include "types.h"
-#include "list.h"
-#include "mm.h"
-
-// 最大进程数
-#define MAX_PROCESS 		1024
-
-// 进程内核栈大小
-#define KERNEL_STACK_SIZE 	8192
+#include "pmm.h"
+#include "vmm.h"
 
 // 进程状态描述
 typedef
@@ -40,19 +34,18 @@ enum task_state {
 
 // 内核线程的上下文切换保存的信息
 struct context {
-    uint32_t cr3;
-    uint32_t eip;
-    uint32_t esp, ebp;
-    uint32_t eax;
-    uint32_t ebx;
-    uint32_t ecx;
-    uint32_t edx;
-    uint32_t esi;
-    uint32_t edi;
+	uint32_t esp;
+	uint32_t ebp;
+	uint32_t ebx;
+	uint32_t esi;
+	uint32_t edi;
+	uint32_t eflags;
 };
 
-// 当前的 pid 值
-extern pid_t now_pid;
+// 进程内存地址结构
+struct mm_struct {
+	pgd_t *pgd_dir; 	// 进程页表
+};
 
 // 进程控制块 PCB 
 struct task_struct {
@@ -61,11 +54,23 @@ struct task_struct {
 	void  	*stack; 		// 进程的内核栈地址
 	struct mm_struct *mm; 		// 当前进程的内存地址映像
 	struct context context; 	// 进程切换需要的上下文信息
-	struct list_head list; 		// 进程的链表
+	struct task_struct *next; 	// 链表指针
 };
 
-// 初始化任务调度
-void init_task();
+// 全局 pid 值
+extern pid_t now_pid;
 
-#endif 	// INCLUDE_PROCESS_H_
+// 内核线程创建
+int32_t kernel_thread(int (*fn)(void *), void *arg);
+
+// 线程退出函数
+void kthread_exit();
+
+// 执行退出操作
+void do_exit();
+
+// 切换到用户模式
+void switch_to_user_mode();
+
+#endif 	// INCLUDE_TASK_H_
 
