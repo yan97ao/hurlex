@@ -138,7 +138,7 @@ void split_chunk(header_t *chunk, uint32_t len)
 		newchunk->prev = chunk;
 		newchunk->next = chunk->next;
 		newchunk->allocated = 0;
-		newchunk->length = chunk->length - len;
+		newchunk->length = chunk->length - len - sizeof(header_t);
 
 		chunk->next = newchunk;
 		chunk->length = len;
@@ -149,7 +149,7 @@ void glue_chunk(header_t *chunk)
 {
 	// 如果该内存块后面有链内存块且未被使用则拼合
 	if (chunk->next && chunk->next->allocated == 0) {
-		chunk->length = chunk->length + chunk->next->length;
+		chunk->length = chunk->length + chunk->next->length + sizeof(header_t);
 		if (chunk->next->next) {
 			chunk->next->next->prev = chunk;
 		}
@@ -158,7 +158,7 @@ void glue_chunk(header_t *chunk)
 
 	// 如果该内存块前面有链内存块且未被使用则拼合
 	if (chunk->prev && chunk->prev->allocated == 0) {
-		chunk->prev->length = chunk->prev->length + chunk->length;
+		chunk->prev->length = chunk->prev->length + chunk->length + sizeof(header_t);
 		chunk->prev->next = chunk->next;
 		if (chunk->next) {
 			chunk->next->prev = chunk->prev;
